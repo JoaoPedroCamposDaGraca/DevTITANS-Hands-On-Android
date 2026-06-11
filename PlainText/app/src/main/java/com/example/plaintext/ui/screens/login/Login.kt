@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -29,9 +30,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -48,6 +51,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -70,7 +74,183 @@ fun Login_screen(
     navigateToList: () -> Unit,
     viewModel: PreferencesViewModel = hiltViewModel()
 ) {
+    LoginContent(
+        navigateToSettings = navigateToSettings,
+        navigateToList = navigateToList
+    )
+}
 
+val backgroundColor = Color(0xFF1E0B00)
+val bannerColor = Color(0xFF9CC137)
+val textColor = Color(0xFFE8D7C8)
+val borderColor = Color(0xFFD7B49A)
+val buttonColor = Color(0xFFF6BE9A)
+
+@Composable
+private fun LoginContent(
+    navigateToSettings: () -> Unit,
+    navigateToList: () -> Unit
+) {
+    var login by rememberSaveable { mutableStateOf("") }
+    var senha by rememberSaveable { mutableStateOf("") }
+    var salvarLogin by rememberSaveable { mutableStateOf(false) }
+
+    Scaffold(
+        containerColor = backgroundColor,
+        topBar = {
+            TopBarComponent(
+                navigateToSettings = navigateToSettings,
+                navigateToSensores = {}
+            )
+        }
+    ) { paddingValues ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(backgroundColor)
+                .padding(paddingValues),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(bannerColor)
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+
+                Image(
+                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                    contentDescription = "Android Logo",
+                    modifier = Modifier.width(80.dp)
+                )
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Column {
+                    Text(
+                        text = "\"The most\nsecure password\nmanager\"",
+                        color = Color.White,
+                        fontSize = 18.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        text = "Bob and Alice",
+                        color = Color.White,
+                        fontSize = 16.sp
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+                text = "Digite suas credenciais para continuar",
+                color = textColor,
+                fontSize = 18.sp
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Login:",
+                    color = textColor,
+                    modifier = Modifier.width(80.dp)
+                )
+
+                OutlinedTextField(
+                    value = login,
+                    onValueChange = { login = it },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = borderColor,
+                        unfocusedBorderColor = borderColor,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        cursorColor = Color.White
+                    )
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Senha:",
+                    color = textColor,
+                    modifier = Modifier.width(80.dp)
+                )
+
+                OutlinedTextField(
+                    value = senha,
+                    onValueChange = { senha = it },
+                    visualTransformation = PasswordVisualTransformation(),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = borderColor,
+                        unfocusedBorderColor = borderColor,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        cursorColor = Color.White
+                    )
+                )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(
+                    checked = salvarLogin,
+                    onCheckedChange = { salvarLogin = it }
+                )
+
+                Text(
+                    text = "Salvar as informações de login",
+                    color = textColor
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(
+                onClick = navigateToList,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = buttonColor
+                )
+            ) {
+                Text(
+                    text = "Enviar",
+                    color = backgroundColor
+                )
+            }
+        }
+    }
+}
+
+@Preview(
+    showBackground = true,
+    showSystemUi = true
+)
+@Composable
+fun LoginScreenPreview() {
+    MaterialTheme {
+        LoginContent(
+            navigateToSettings = {},
+            navigateToList = {}
+        )
+    }
 }
 
 @Composable
@@ -108,6 +288,11 @@ fun TopBarComponent(
     }
 
     TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = backgroundColor,
+            titleContentColor = textColor,
+            actionIconContentColor = textColor
+        ),
         title = { Text("PlainText") },
         actions = {
             if (navigateToSettings != null && navigateToSensores != null) {
