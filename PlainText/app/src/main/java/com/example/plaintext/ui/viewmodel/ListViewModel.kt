@@ -32,11 +32,14 @@ open class ListViewModel @Inject constructor () : ViewModel() {
     var listViewState by mutableStateOf(ListViewState(passwordList = emptyList()))
         private set
 
-    init{
+    init {
         viewModelScope.launch {
-                //execute o metodo getList() do passwordDBStore e colete o resultado
-            }
+            listViewState = ListViewState(
+                passwordList = emptyList(),
+                isCollected = true
+            )
         }
+    }
 
 
     fun savePassword(password: PasswordInfo){

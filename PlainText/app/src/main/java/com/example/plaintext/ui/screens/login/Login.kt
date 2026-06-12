@@ -63,6 +63,7 @@ import com.example.plaintext.ui.viewmodel.PreferencesViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
+
 data class LoginState(
     val preencher: Boolean,
     val login: String,
@@ -99,20 +100,48 @@ class LoginViewModel @Inject constructor() : ViewModel() {
     fun updatePreencher(preencher: Boolean) {
         loginState = loginState.copy(preencher = preencher)
     }
+
+    fun checkCredentials(preencher: Boolean){
+     loginState = loginState.copy(preencher=preencher)
+    }
+    fun checkCredentials(
+        correctLogin: String,
+        correctPassword: String,
+        onSuccess: () -> Unit,
+        onError: () -> Unit
+    ){
+        if (loginState.login == correctLogin && loginState.password == correctPassword){
+            onSuccess()
+        }else{
+            onError()
+        }
+    }
 }
 @Composable
 fun Login_screen(
     navigateToSettings: () -> Unit,
     navigateToList: () -> Unit,
-    viewModel: LoginViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel(),
+    preferencesViewModel: PreferencesViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     LoginContent(
         navigateToSettings = navigateToSettings,
         navigateToList = navigateToList,
         loginState = viewModel.loginState,
         updateLogin = viewModel::updateLogin,
         updatePassword = viewModel::updatePassword,
-        updateSaveLogin = viewModel::updateSaveLogin
+        updateSaveLogin = viewModel::updateSaveLogin,
+        onEnviar = {
+            viewModel.checkCredentials(
+                correctLogin = preferencesViewModel.preferencesState.login,
+                correctPassword = preferencesViewModel.preferencesState.password,
+                onSuccess = { navigateToList() },
+                onError = {
+                    Toast.makeText(context, "Login/Senha inválidos", Toast.LENGTH_SHORT).show()
+                }
+            )
+        }
     )
 }
 
@@ -129,7 +158,8 @@ private fun LoginContent(
     loginState: LoginUiState,
     updateLogin: (String) -> Unit,
     updatePassword: (String) -> Unit,
-    updateSaveLogin: (Boolean) -> Unit
+    updateSaveLogin: (Boolean) -> Unit,
+    onEnviar: () -> Unit
 ) {
     Scaffold(
         containerColor = backgroundColor,
@@ -261,7 +291,7 @@ private fun LoginContent(
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
-                onClick = navigateToList,
+                onClick = onEnviar,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = buttonColor
                 )
@@ -288,7 +318,8 @@ fun LoginScreenPreview() {
             loginState = LoginUiState(),
             updateLogin = {},
             updatePassword = {},
-            updateSaveLogin = {}
+            updateSaveLogin = {},
+            onEnviar = {}
         )
     }
 }

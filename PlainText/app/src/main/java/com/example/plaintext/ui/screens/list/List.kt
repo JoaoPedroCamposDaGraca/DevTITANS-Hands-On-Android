@@ -46,7 +46,25 @@ import com.example.plaintext.data.model.PasswordInfo
 
 @Composable
 fun ListView(
-) {}
+    navigateToEdit: (password: PasswordInfo) -> Unit = {},
+    navigateToAdd: () -> Unit = {},
+    viewModel: ListViewModel = hiltViewModel()
+) {
+    Scaffold(
+        topBar = {
+            TopBarComponent()
+        },
+        floatingActionButton = {
+            AddButton(onClick = navigateToAdd)
+        }
+    ) { paddingValues ->
+        ListItemContent(
+            modifier = Modifier.padding(paddingValues),
+            listState = viewModel.listViewState,
+            navigateToEdit = navigateToEdit
+        )
+    }
+}
 
 @Composable
 fun AddButton(onClick: () -> Unit) {

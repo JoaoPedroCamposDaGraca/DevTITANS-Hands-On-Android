@@ -36,12 +36,17 @@ fun PlainTextApp(
             var args = it.toRoute<Screen.Hello>()
             Hello_screen(args)
         }
-        composable<Screen.Login>{
+        composable<Screen.Login> {
             Login_screen(
-                navigateToSettings = {appState.navController.navigate(Screen.Login)},
-                navigateToList = {appState.navController.navigate(Screen.Hello)}
+                navigateToSettings = { appState.navController.navigate(Screen.Preferences) },
+                navigateToList = { appState.navController.navigate(Screen.List) }
             )
         }
+
+        composable<Screen.List> {
+            ListView()
+        }
+
         composable<Screen.EditList>(
             typeMap = mapOf(typeOf<PasswordInfo>() to parcelableType<PasswordInfo>())
         ) {
