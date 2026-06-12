@@ -52,6 +52,96 @@ fun EditList(
     savePassword: (password: PasswordInfo) -> Unit
 ) {
 
+    val password = args.password
+
+    val state = EditListState(
+        nomeState = rememberSaveable {
+            mutableStateOf(password.name)
+        },
+        usuarioState = rememberSaveable {
+            mutableStateOf(password.login)
+        },
+        senhaState = rememberSaveable {
+            mutableStateOf(password.password)
+        },
+        notasState = rememberSaveable {
+            mutableStateOf(password.notes)
+        }
+    )
+
+    val titulo =
+        if (isPasswordEmpty(password))
+            "Adicionar nova senha"
+        else
+            "Editar senha"
+
+    Scaffold(
+        topBar = {
+            TopBarComponent()
+        }
+    ) { padding ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Text(
+                text = titulo,
+                fontSize = 24.sp,
+                modifier = Modifier.padding(16.dp)
+            )
+
+            EditInput(
+                textInputLabel = "Nome",
+                textInputState = state.nomeState
+            )
+
+            EditInput(
+                textInputLabel = "Usuário",
+                textInputState = state.usuarioState
+            )
+
+            EditInput(
+                textInputLabel = "Senha",
+                textInputState = state.senhaState
+            )
+
+            EditInput(
+                textInputLabel = "Notas",
+                textInputState = state.notasState,
+                textInputHeight = 150
+            )
+
+            Spacer(
+                modifier = Modifier.weight(1f)
+            )
+
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                onClick = {
+
+                    savePassword(
+                        PasswordInfo(
+                            id = password.id,
+                            name = state.nomeState.value,
+                            login = state.usuarioState.value,
+                            password = state.senhaState.value,
+                            notes = state.notasState.value
+                        )
+                    )
+
+                    navigateBack()
+                }
+            ) {
+                Text("Salvar")
+            }
+        }
+    }
 }
 
 
