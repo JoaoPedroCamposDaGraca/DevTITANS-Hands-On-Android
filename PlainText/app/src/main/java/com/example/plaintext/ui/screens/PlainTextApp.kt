@@ -39,7 +39,7 @@ fun PlainTextApp(
         composable<Screen.Login>{
             Login_screen(
                 navigateToSettings = {appState.navController.navigate(Screen.Login)},
-                navigateToList = {appState.navController.navigate(Screen.List)}
+                navigateToList = {appState.navController.navigate(Screen.Hello)}
             )
         }
         composable<Screen.EditList>(

@@ -55,10 +55,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.plaintext.R
 import com.example.plaintext.ui.viewmodel.PreferencesViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 data class LoginState(
     val preencher: Boolean,
@@ -68,15 +71,48 @@ data class LoginState(
     val checkCredentials: (login: String, password: String) -> Boolean,
 )
 
+data class LoginUiState(
+    val login: String = "",
+    val password: String = "",
+    val preencher: Boolean = false,
+    val saveLogin: Boolean = false
+)
+
+@HiltViewModel
+class LoginViewModel @Inject constructor() : ViewModel() {
+
+    var loginState by mutableStateOf(LoginUiState())
+        private set
+
+    fun updateLogin(login: String) {
+        loginState = loginState.copy(login = login)
+    }
+
+    fun updatePassword(password: String) {
+        loginState = loginState.copy(password = password)
+    }
+
+    fun updateSaveLogin(saveLogin: Boolean) {
+        loginState = loginState.copy(saveLogin = saveLogin)
+    }
+
+    fun updatePreencher(preencher: Boolean) {
+        loginState = loginState.copy(preencher = preencher)
+    }
+}
 @Composable
 fun Login_screen(
     navigateToSettings: () -> Unit,
     navigateToList: () -> Unit,
-    viewModel: PreferencesViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
     LoginContent(
         navigateToSettings = navigateToSettings,
-        navigateToList = navigateToList
+        navigateToList = navigateToList,
+        loginState = viewModel.loginState,
+        updateLogin = viewModel::updateLogin,
+        updatePassword = viewModel::updatePassword,
+        updateSaveLogin = viewModel::updateSaveLogin
     )
 }
 
@@ -89,12 +125,12 @@ val buttonColor = Color(0xFFF6BE9A)
 @Composable
 private fun LoginContent(
     navigateToSettings: () -> Unit,
-    navigateToList: () -> Unit
+    navigateToList: () -> Unit,
+    loginState: LoginUiState,
+    updateLogin: (String) -> Unit,
+    updatePassword: (String) -> Unit,
+    updateSaveLogin: (Boolean) -> Unit
 ) {
-    var login by rememberSaveable { mutableStateOf("") }
-    var senha by rememberSaveable { mutableStateOf("") }
-    var salvarLogin by rememberSaveable { mutableStateOf(false) }
-
     Scaffold(
         containerColor = backgroundColor,
         topBar = {
@@ -167,8 +203,8 @@ private fun LoginContent(
                 )
 
                 OutlinedTextField(
-                    value = login,
-                    onValueChange = { login = it },
+                    value = loginState.login,
+                    onValueChange = updateLogin,
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = borderColor,
@@ -192,8 +228,8 @@ private fun LoginContent(
                 )
 
                 OutlinedTextField(
-                    value = senha,
-                    onValueChange = { senha = it },
+                    value = loginState.password,
+                    onValueChange = updatePassword,
                     visualTransformation = PasswordVisualTransformation(),
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
@@ -212,8 +248,8 @@ private fun LoginContent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
-                    checked = salvarLogin,
-                    onCheckedChange = { salvarLogin = it }
+                    checked = loginState.saveLogin,
+                    onCheckedChange = updateSaveLogin
                 )
 
                 Text(
@@ -248,7 +284,11 @@ fun LoginScreenPreview() {
     MaterialTheme {
         LoginContent(
             navigateToSettings = {},
-            navigateToList = {}
+            navigateToList = {},
+            loginState = LoginUiState(),
+            updateLogin = {},
+            updatePassword = {},
+            updateSaveLogin = {}
         )
     }
 }
